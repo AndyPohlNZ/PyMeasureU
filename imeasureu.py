@@ -105,7 +105,52 @@ class IMeasureU:
         periods = [(t - s)/1e6 for s, t in zip(self.timestamp, self.timestamp[1:])]
         self.sampleRate = float(1)/mean(periods)
 
-    def plotIMU(self):
+    def plot(self, sensorType = 'accn', show=True, ax = None):
+        '''
+        Plots signals from the specified sensor type on an IMU
+
+        Args:
+            sensorType <string>: either 'accn', 'gyro' or 'mag' specifying which sensor to plot
+            show <bool>: Wheter to show the plot or not.
+
+        Returns:
+            plot <matplotlib obj>: sensor plot can be viewed 
+        '''
+        if not ax:
+            f, ax = plt.subplots()
+
+        if sensorType == 'accn':
+            ax.plot(self.timestamp/1e6, self.accn[:,0]/self.EARTH_GRAVITY, alpha=0.4)
+            ax.plot(self.timestamp/1e6, self.accn[:,1]/self.EARTH_GRAVITY, alpha=0.4)
+            ax.plot(self.timestamp/1e6, self.accn[:,2]/self.EARTH_GRAVITY, alpha=0.4)
+            ax.legend(['x', 'y', 'z'])
+            ax.set_xlabel('Time [s]')
+            ax.set_ylabel('Acceleration [g]')
+            ax.set_ylim([-16.5, 16.5])
+            #ax.title('Accelerometer')
+
+        elif sensorType == 'gyro':
+            ax.plot(self.timestamp/1e6, self.gyro[:,0], alpha=0.4)
+            ax.plot(self.timestamp/1e6, self.gyro[:,1], alpha=0.4)
+            ax.plot(self.timestamp/1e6, self.gyro[:,2], alpha=0.4)
+            ax.legend(['x', 'y', 'z'])
+            ax.set_xlabel('Time [s]')
+            ax.set_ylabel('Angular Velocity [deg/s]')
+            ax.set_ylim([-2000.5, 2000.5])
+            #plt.title('Gyroscope')
+
+        # TODO implelment mag plot...
+        
+        else:
+            raise Exception('Specified sensorType not accn, gyro or mag')
+
+        if show:
+            plt.show()
+
+        return ax
+
+
+    def plotIMU(self, show=True):
         '''
         Plots signals from IMU object
 
@@ -115,28 +160,32 @@ class IMeasureU:
         Returns:
             void
         '''
-        fig = plt.figure()
-        plt.subplot(1,2,1)
-        plt.plot(self.timestamp/1e6, self.accn[:,0]/self.EARTH_GRAVITY, alpha=0.4)
-        plt.plot(self.timestamp/1e6, self.accn[:,1]/self.EARTH_GRAVITY, alpha=0.4)
-        plt.plot(self.timestamp/1e6, self.accn[:,2]/self.EARTH_GRAVITY, alpha=0.4)
-        plt.legend(['x', 'y', 'z'])
-        plt.xlabel('Time [s]')
-        plt.ylabel('Acceleration [g]')
-        plt.ylim([-16.5, 16.5])
-        plt.title('Accelerometer')
+        f, (ax21, ax22) = plt.subplots(1,2)
+        
+        self.plot(sensorType='accn', show=False, ax =ax21)
+        #ax21.set_title('Accelerometer')
+        # plt.plot(self.timestamp/1e6, self.accn[:,0]/self.EARTH_GRAVITY, alpha=0.4)
+        # plt.plot(self.timestamp/1e6, self.accn[:,1]/self.EARTH_GRAVITY, alpha=0.4)
+        # plt.plot(self.timestamp/1e6, self.accn[:,2]/self.EARTH_GRAVITY, alpha=0.4)
+        # plt.legend(['x', 'y', 'z'])
+        # plt.xlabel('Time [s]')
+        # plt.ylabel('Acceleration [g]')
+        # plt.ylim([-16.5, 16.5])
+        # plt.title('Accelerometer')
 
-        plt.subplot(1,2,2)
-        plt.plot(self.timestamp/1e6, self.gyro[:,0], alpha=0.4)
-        plt.plot(self.timestamp/1e6, self.gyro[:,1], alpha=0.4)
-        plt.plot(self.timestamp/1e6, self.gyro[:,2], alpha=0.4)
-        plt.legend(['x', 'y', 'z'])
-        plt.xlabel('Time [s]')
-        plt.ylabel('Angular Velocity [deg/s]')
-        plt.ylim([-2000.5, 2000.5])
-        plt.title('Gyroscope')
-
-        plt.show()
+        self.plot(sensorType='gyro', show=False, ax =ax22)
+        #ax22.set_title('Gyroscope')
+        # plt.plot(self.timestamp/1e6, self.gyro[:,0], alpha=0.4)
+        # plt.plot(self.timestamp/1e6, self.gyro[:,1], alpha=0.4)
+        # plt.plot(self.timestamp/1e6, self.gyro[:,2], alpha=0.4)
+        # plt.legend(['x', 'y', 'z'])
+        # plt.xlabel('Time [s]')
+        # plt.ylabel('Angular Velocity [deg/s]')
+        # plt.ylim([-2000.5, 2000.5])
+        # plt.title('Gyroscope')
+        if show:
+            plt.show()
+        return f
 
 
     def resample(self, desiredSampleRate=200):
@@ -255,6 +304,7 @@ if __name__ == '__main__':
 
     IMU.loadData()
     print(IMU)
+    IMU.plotIMU()
 
 
                 

@@ -2,6 +2,7 @@
 
 from imeasureu import IMeasureU
 import warnings
+import matplotlib.pyplot as plt
 
 
 class Session():
@@ -52,20 +53,68 @@ class Session():
         for i in range(len(self.sensorData)):
             sensor_lengths.append(self.sensorData[i].recordTime)
 
-        print(sensor_lengths)
 
         if not checkEqual(sensor_lengths):
             warnings.warn("Not all sensor data provided recorded for the same length.  Are you sure the all sensors are from the same session?", Warning)
 
     def trim(self):
+
+        # make subplot
+
+        sensor_names = [sensor.name for sensor in self.sensorData]
+        sensor_idx = None
+        while sensor_idx is None:
+            try:
+                trim_sensor = input("Specify name of sensor to identify trim points:")
+                sensor_idx = sensor_names.index(trim_sensor)
+                break
+            except ValueError:
+                print("%s is not the name of a sensor in your session. Please try again." % (trim_sensor))
+
         
+        sensor = self.sensorData[sensor_idx]
+        f = sensor.plotIMU(show =False)
+        f.suptitle('Please Select two trim points with mouse.  Press right mouse button to undo.', fontsize=14)
+        f.show()
+        trim_pts = []
+
+        trim_pts = f.ginput(2, show_clicks=True)
+
+        xlocs = [x[0] for x in trim_pts]
+        for x in xlocs:
+            for ax in f.axes:
+                ax.axvline(x = x)
+
+        satisified = input("Are you satisified with Trimpoints [y/n]:")
+        if satisified=='n':
+            raise Exception("Trimming failed!")
+
+        else:
+            trim_range = (sensor.timestamp >= xlocs[0]*1e6) & (sensor.timestamp <=xlocs[1]*1e6)
+            for sensor in self.sensorData:
+                sensor.timestamp = sensor.timestamp[trim_range]
+                sensor.accn = sensor.accn[trim_range,]
+                sensor.gyro = sensor.gyro[trim_range,]
+
         
 
+            
 
+
+        
+
+# 'Private functions'
 def checkEqual(iterator):
    return len(set(iterator)) <= 1
+
+def tellme(s):
+    print(s)
+    plt.title(s, fontsize=16)
+    plt.draw()
 
 
 if __name__ == "__main__":
     pilot02 = Session("pilot02", 1)
     pilot02.loadSensorData(resample=True)
+    pilot02.trim()
+    pilot02.sensorData[0].plotIMU()
