@@ -12,7 +12,7 @@ class IMeasureU:
     '''
     Class to handle files from IMeasureU BlueTrident sensors
 
-    Created by: Andy Pohl
+    Created by: Andy Pohl - andrew.pohl@ucalgary.ca
                 University of Calgary
                 November 2019
     '''
@@ -38,6 +38,9 @@ class IMeasureU:
         self.accn = []
         self.gyro = []
         #self.mag = []
+
+    def __str__(self):
+        return("IMeasureU Sensor Data for sensor: " + self.name + "\nRecord Type: " + self.type +"-" +self.recordType + "\nSample Rate: " + str(self.sampleRate) + "Hz\nRecording Length: " + str(self.recordTime)+"s")
 
     def loadData(self):
         '''
@@ -136,7 +139,7 @@ class IMeasureU:
         plt.show()
 
 
-    def resampleIMU(self, desiredSampleRate=200):
+    def resample(self, desiredSampleRate=200):
         ''' 
         Resamples signals to desiredSample Rate via first interpolating with cubic splines
         then resampling at new fequency.
@@ -251,8 +254,7 @@ if __name__ == '__main__':
     print(IMU.fileloc)
 
     IMU.loadData()
-    IMU.plotIMU()
-    IMU.resampleIMU()
-    IMU.plotIMU()
-    IMU.save('P002_Downsamp_Heelstrike.csv', location = '/home/andy-pohl/PhD-Calgary/Course_work/CPSC601/Project/Code', type = 'obj')
+    print(IMU)
+
+
                 
