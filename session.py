@@ -73,11 +73,14 @@ class Session():
 
         
         sensor = self.sensorData[sensor_idx]
+
+
         f = sensor.plotIMU(show =False)
         f.suptitle('Please Select two trim points with mouse.  Press right mouse button to undo.', fontsize=14)
         f.show()
         trim_pts = []
 
+        #TODO make trim points keep asking until satisified
         trim_pts = f.ginput(2, show_clicks=True)
 
         xlocs = [x[0] for x in trim_pts]
@@ -96,12 +99,6 @@ class Session():
                 sensor.accn = sensor.accn[trim_range,]
                 sensor.gyro = sensor.gyro[trim_range,]
 
-        
-
-            
-
-
-        
 
 # 'Private functions'
 def checkEqual(iterator):

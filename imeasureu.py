@@ -6,6 +6,7 @@ import time
 from statistics import mean
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
+from scipy.signal import butter, filtfilt
 
 
 class IMeasureU:
@@ -224,6 +225,38 @@ class IMeasureU:
         self.gyro = gyro_resampe
         self.resampled = True
 
+    def filterAccn(self, order, cutoff, passType = 'low', type='butter'):
+        '''
+        Filters the acceleration signal at the given lpcutoff frequency
+
+        Args:
+            order <int> order of filter
+            cutoff <int> cutoff freq for filter
+            passType <string> currently only low pass filtering implemented
+            type <string> Type of filter, currently only butterworth implemented.
+
+        Returns:
+            Void
+        '''
+
+        if type != 'butter':
+            raise Exception("Sorry only butterworth filtering implemented.")
+
+        sf = self.sampleRate
+
+        if passType == 'low':
+            Wn = lpcutoff/(fs/2)
+            b, a = butter(order/2, Wn, btype = 'lowpass')
+        
+        #TODO implement high pass and band pass filters.
+
+        # apply filter
+        for i in range(3):
+            self.accn[:,i] = filtfilt(b,a self.accn[:,i]))
+        
+
+
+
     def save(self, filename, location, type='csv'):
         '''
         Saves the IMU object to disk at the specified file location.
@@ -260,10 +293,7 @@ class IMeasureU:
         else:
             raise Exception("Cannot save file of type %s." % type)
 
-
-
-
-
+    #TODO Filtering method
 
 
 # Private functions:
