@@ -225,7 +225,7 @@ class IMeasureU:
         self.gyro = gyro_resampe
         self.resampled = True
 
-    def filterAccn(self, order, cutoff, passType = 'low', type='butter'):
+    def filterSignal(self, order, cutoff, signal = 'accn', passType = 'low', type='butter'):
         '''
         Filters the acceleration signal at the given lpcutoff frequency
 
@@ -251,8 +251,12 @@ class IMeasureU:
         #TODO implement high pass and band pass filters.
 
         # apply filter
-        for i in range(3):
-            self.accn[:,i] = filtfilt(b,a self.accn[:,i]))
+        if signal == 'accn':
+            for i in range(3):
+                self.accn[:,i] = filtfilt(b,a, self.accn[:,i])
+        elif signal == 'gyro':
+            for i in range(3):
+                self.gyro[:,i] = filtfilt(b,a, self.gyro[:,i])
         
 
 
