@@ -242,10 +242,10 @@ class IMeasureU:
         if type != 'butter':
             raise Exception("Sorry only butterworth filtering implemented.")
 
-        sf = self.sampleRate
+        fs = self.sampleRate
 
         if passType == 'low':
-            Wn = lpcutoff/(fs/2)
+            Wn = cutoff/(fs/2)
             b, a = butter(order/2, Wn, btype = 'lowpass')
         
         #TODO implement high pass and band pass filters.
