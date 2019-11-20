@@ -258,6 +258,53 @@ class IMeasureU:
             for i in range(3):
                 self.gyro[:,i] = filtfilt(b,a, self.gyro[:,i])
         
+    def trim(self):
+        '''
+        Trims the IMU signals and resets timestamp to start at 0 given user input from ginput.
+
+        Args:
+            None
+
+        Returns:
+            Void
+        '''
+
+        # Get Trip points
+        satisified = False
+        while not satisified:
+            f = self.plotIMU(show =False)
+            f.suptitle('Please Select two trim points with mouse.  \nPress right mouse button to undo.', fontsize=12)
+            f.show()
+            trim_pts = f.ginput(2, show_clicks=True)
+            plt.close(f)
+
+            xlocs = [x[0] for x in trim_pts]
+            for ax in f.axes:
+                ax.axvline(x = xlocs[0], color='k')
+                ax.axvline(x = xlocs[1], color='k')
+                ax.axvspan(xlocs[0], xlocs[1], color = 'grey', alpha=0.2)
+            
+            f.suptitle('Are you satisifed with trimmed section?', fontsize=12)
+            f.show()
+
+            satisified_input=input("Are you satisifed with trim [y/n]: ")
+            if satisified_input.lower()=='y':
+                satisified = True
+            else:
+                satisified = False
+
+        lidx = (self.timestamp >= xlocs[0]*1e6) & (self.timestamp <=xlocs[1]*1e6)
+        self.timestamp = self.timestamp[lidx]
+        self.timestamp = self.timestamp - self.timestamp[0]
+
+        self.accn = self.accn[lidx,:]
+        self.gyro = self.gyro[lidx,:]
+        
+
+
+
+
+
 
 
 
